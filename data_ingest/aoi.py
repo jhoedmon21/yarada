@@ -3,8 +3,8 @@ aoi.py — Definición del Área de Interés (AOI).
 
 Un `AreaOfInterest` encapsula el recorte geográfico que el usuario analiza:
  bounding box WGS84, geometría `ee.Geometry` equivalente y resolución de trabajo.
-El registro de zonas cubre la provincia de Camaná (Arequipa) con sus 8
-distritos oficiales (ríos Camaná–Majes, Ocoña y Quilca); cualquier otra
+El registro de zonas cubre el distrito de La Yarada-Los Palos (provincia de
+Tacna, ubigeo 230111) —distrito completo y subsectores clave—; cualquier otra
 zona puede analizarse mediante coordenadas personalizadas (parse_bbox_text).
 """
 
@@ -58,12 +58,13 @@ class AreaOfInterest:
 # ---------------------------------------------------------------------------
 # Registro de zonas de análisis (análisis multi-zona)
 #
-# FOCO: la provincia de CAMANÁ (Arequipa) y sus 8 distritos oficiales
-# (ubigeo 0402xx): Camaná, José María Quimper, Mariano Nicolás Valcárcel,
-# Mariscal Cáceres, Nicolás de Piérola, Ocoña, Quilca y Samuel Pastor.
-# Sistemas fluviales: Majes–Camaná, Ocoña (sector Anchalo) y Quilca.
-# Los bboxes son aproximados por zona; la escala de trabajo es de 100 m
-# (análisis distrital).
+# FOCO: el distrito de LA YARADA-LOS PALOS (provincia de Tacna, ubigeo
+# 230111, Ley N.º 30358 del 07/11/2015): distrito completo (2 320 km²,
+# capital Los Palos, fronterizo con Chile) y sus subsectores clave.
+# Sistema hidrográfico: río Caplina (curso inferior y acuífero que alimenta
+# la irrigación de La Yarada) y quebradas del norte (Cauñani, El Hospicio,
+# Agua Dulce). Los bboxes son aproximados por zona; la escala de trabajo
+# es de 100 m (análisis distrital).
 #
 # El usuario también puede analizar cualquier otra zona mediante coordenadas
 # personalizadas (parse_bbox_text).
@@ -71,57 +72,37 @@ class AreaOfInterest:
 _ZONE_SCALE_M = 100.0  # resolución de trabajo para distritos completos
 
 ZONE_PRESETS: dict[str, AreaOfInterest] = {
-    # ---------- Provincia de CAMANÁ (Arequipa) — 8 distritos ----------
-    # Distritos oficiales (ubigeo 0402xx): Camaná, José María Quimper,
-    # Mariano Nicolás Valcárcel, Mariscal Cáceres, Nicolás de Piérola,
-    # Ocoña, Quilca y Samuel Pastor. Sistemas fluviales: Majes–Camaná,
-    # Ocoña (sector Anchalo, desborde 02/2025) y Quilca. Los bboxes son
-    # referenciales (capital distrital + valle circundante).
-    "camana-camana": AreaOfInterest(
-        name="Camaná — Distrito de Camaná (valle bajo río Camaná)",
-        min_lon=-72.85, min_lat=-16.72, max_lon=-72.60, max_lat=-16.55,
+    # ---------- Distrito de LA YARADA-LOS PALOS (Tacna) ----------
+    # Ubigeo 230111 · Ley N.º 30358 (07/11/2015) · capital: Los Palos ·
+    # 2 320 km² · frontera sur con Chile (punto Concordia). Sistema
+    # fluvial: río Caplina (esporádico, crecidas excepcionales FEN) y
+    # quebradas del norte. Bboxes referenciales (litoral, valle agrícola
+    # y eje del río).
+    "tacna-yarada-los-palos": AreaOfInterest(
+        name="La Yarada-Los Palos — Distrito completo (provincia de Tacna)",
+        min_lon=-70.5853, min_lat=-18.3501, max_lon=-70.3161, max_lat=-18.0776,
         scale_m=_ZONE_SCALE_M,
     ),
-    "camana-quimper": AreaOfInterest(
-        name="Camaná — Dto. José María Quimper (El Cardo)",
-        min_lon=-72.85, min_lat=-16.70, max_lon=-72.60, max_lat=-16.55,
+    "tacna-yarada": AreaOfInterest(
+        name="La Yarada-Los Palos — Valle agrícola La Yarada (irrigación Caplina)",
+        min_lon=-70.5650, min_lat=-18.3100, max_lon=-70.4200, max_lat=-18.1500,
         scale_m=_ZONE_SCALE_M,
     ),
-    "camana-valcarcel": AreaOfInterest(
-        name="Camaná — Dto. Mariano Nicolás Valcárcel (Urasqui)",
-        min_lon=-73.30, min_lat=-16.10, max_lon=-73.05, max_lat=-15.90,
+    "tacna-los-palos": AreaOfInterest(
+        name="La Yarada-Los Palos — Balneario Los Palos y litoral sur (frontera)",
+        min_lon=-70.4900, min_lat=-18.3501, max_lon=-70.3800, max_lat=-18.2450,
         scale_m=_ZONE_SCALE_M,
     ),
-    "camana-mcaceres": AreaOfInterest(
-        name="Camaná — Dto. Mariscal Cáceres (San José)",
-        min_lon=-72.85, min_lat=-16.72, max_lon=-72.60, max_lat=-16.55,
-        scale_m=_ZONE_SCALE_M,
-    ),
-    "camana-pierola": AreaOfInterest(
-        name="Camaná — Dto. Nicolás de Piérola (San Gregorio)",
-        min_lon=-72.85, min_lat=-16.70, max_lon=-72.60, max_lat=-16.52,
-        scale_m=_ZONE_SCALE_M,
-    ),
-    "camana-ocona": AreaOfInterest(
-        name="Camaná — Dto. de Ocoña (río Ocoña)",
-        min_lon=-73.25, min_lat=-16.55, max_lon=-73.00, max_lat=-16.35,
-        scale_m=_ZONE_SCALE_M,
-    ),
-    "camana-quilca": AreaOfInterest(
-        name="Camaná — Dto. de Quilca (bahía de Quilca)",
-        min_lon=-72.60, min_lat=-16.85, max_lon=-72.30, max_lat=-16.62,
-        scale_m=_ZONE_SCALE_M,
-    ),
-    "camana-spastor": AreaOfInterest(
-        name="Camaná — Dto. Samuel Pastor (La Pampa)",
-        min_lon=-72.85, min_lat=-16.70, max_lon=-72.65, max_lat=-16.52,
+    "tacna-caplina": AreaOfInterest(
+        name="La Yarada-Los Palos — Eje río Caplina (curso inferior y quebradas)",
+        min_lon=-70.5853, min_lat=-18.2450, max_lon=-70.3500, max_lat=-18.0776,
         scale_m=_ZONE_SCALE_M,
     ),
 }
 
-# AOI por defecto: distrito de Camaná, capital de la provincia (valle bajo
-# del río Camaná–Majes; crecidas estivales, desbordes 02/2025 en el litoral).
-DEFAULT_AOI = ZONE_PRESETS["camana-camana"]
+# AOI por defecto: distrito completo de La Yarada-Los Palos (pampa costera
+# fronteriza; crecidas excepcionales del Caplina y huaicos en quebradas).
+DEFAULT_AOI = ZONE_PRESETS["tacna-yarada-los-palos"]
 
 
 def list_zones() -> list[dict]:

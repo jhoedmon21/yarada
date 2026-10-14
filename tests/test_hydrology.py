@@ -111,54 +111,55 @@ def test_mensaje_alerta_contiene_nivel(snapshot):
 
 
 def test_zonas_registro():
-    """Registro de zonas: exclusivamente los 8 distritos de Camaná (Arequipa)."""
+    """Registro de zonas: distrito de La Yarada-Los Palos (Tacna) + subsectores."""
     from hidroalert.data_ingest.aoi import (
         list_zones, get_zone, resolve_aoi, DEFAULT_AOI,
     )
 
     zonas = list_zones()
     ids = {z["id"] for z in zonas}
-    # Cobertura = provincia de Camaná: solo sus 8 distritos oficiales
-    assert len(zonas) == 8
-    assert all(zid.startswith("camana-") for zid in ids)
-    assert not any("piura" in zid or "tumbes" in zid for zid in ids)
-    # El distrito capital (Camaná) encabeza el registro y es el AOI por defecto.
-    assert zonas[0]["id"] == "camana-camana"  # default primero
+    # Cobertura = distrito de La Yarada-Los Palos: completo + 3 subsectores
+    assert len(zonas) == 4
+    assert all(zid.startswith("tacna-") for zid in ids)
+    assert not any("camana" in zid or "piura" in zid for zid in ids)
+    # El distrito completo encabeza el registro y es el AOI por defecto.
+    assert zonas[0]["id"] == "tacna-yarada-los-palos"  # default primero
     assert [z["id"] for z in zonas] == [
-        "camana-camana", "camana-quimper", "camana-valcarcel", "camana-mcaceres",
-        "camana-pierola", "camana-ocona", "camana-quilca", "camana-spastor",
+        "tacna-yarada-los-palos", "tacna-yarada", "tacna-los-palos", "tacna-caplina",
     ]
 
-    zc = get_zone("CAMANA-OCONA")  # case-insensitive
-    assert zc is not None and "Ocoña" in zc.name
+    zc = get_zone("TACNA-YARADA")  # case-insensitive
+    assert zc is not None and "Valle agrícola" in zc.name
     assert get_zone("no_existe") is None
-    assert get_zone("piura-sullana") is None  # zona retirada del registro
+    assert get_zone("camana-camana") is None  # zona retirada del registro
 
     # resolve_aoi: vacío -> default; id -> preset; bbox -> personalizado
     assert resolve_aoi("") is DEFAULT_AOI
     assert resolve_aoi(None) is DEFAULT_AOI
-    assert resolve_aoi("camana-quilca").name.startswith("Camaná — Dto. de Quilca")
-    custom = resolve_aoi("-72.8,-16.7,-72.7,-16.6")  # bbox en el valle de Camaná
-    assert abs(custom.min_lon - (-72.8)) < 1e-9
+    assert resolve_aoi("tacna-los-palos").name.startswith("La Yarada-Los Palos")
+    custom = resolve_aoi("-70.53,-18.30,-70.45,-18.25")  # bbox en la pampa de La Yarada
+    assert abs(custom.min_lon - (-70.53)) < 1e-9
     # BBox inválido raise (comportamiento esperado)
     import pytest
     with pytest.raises(ValueError):
         resolve_aoi("99,99,100,100")
 
 
-def test_bankfull_por_distrito_camana():
-    """Bankfull calibrado por río para los 8 distritos de Camaná (Arequipa)."""
-    from hidroalert.config import bankfull_for_zone, BANKFULL_BY_RIVER_M
+def test_bankfull_por_distrito_yarada():
+    """Bankfull calibrado por río para el distrito de La Yarada-Los Palos (Tacna)."""
+    from hidroalert.config import (
+        bankfull_for_zone, BANKFULL_BY_RIVER_M, BANKFULL_DEPTH_M,
+    )
 
-    # Valle del Majes–Camaná (banco amplio y pedregoso)
-    for zid in ("camana-camana", "camana-quimper", "camana-mcaceres",
-                "camana-pierola", "camana-spastor"):
-        assert bankfull_for_zone(zid) == BANKFULL_BY_RIVER_M["camana"]
-    # Urasqui está en el valle del Ocoña; Ocoña usa su propio bankfull
-    assert bankfull_for_zone("camana-valcarcel") == BANKFULL_BY_RIVER_M["ocoña"]
-    assert bankfull_for_zone("camana-ocona") == BANKFULL_BY_RIVER_M["ocoña"]
-    # Quilca: sección estrecha en la desembocadura
-    assert bankfull_for_zone("camana-quilca") == BANKFULL_BY_RIVER_M["quilca"]
+    # Todas las zonas del registro drenan al sistema del río Caplina
+    for zid in ("tacna-yarada-los-palos", "tacna-yarada",
+                "tacna-los-palos", "tacna-caplina"):
+        assert bankfull_for_zone(zid) == BANKFULL_BY_RIVER_M["caplina"]
+    # El nombre del cauce también mapea (AOIs personalizados)
+    assert bankfull_for_zone("bbox-custom", "río Caplina — desembocadura") == \
+        BANKFULL_BY_RIVER_M["caplina"]
+    # Fuera del sistema Caplina: bankfull global
+    assert bankfull_for_zone("piura-chira") == BANKFULL_DEPTH_M
 
 
 def test_concentracion_agua_sobre_terreno(snapshot):

@@ -184,18 +184,15 @@ BANKFULL_DEPTH_M = float(_env("BANKFULL_DEPTH_M", "1.0"))
 
 # ---------------------------------------------------------------------------
 # Bankfull calibrado por río (m): capacidad de banco específica de cada cauce
-# principal de la provincia de Camaná (Arequipa). Se usa cuando la zona de
-# análisis corresponde a uno de estos ríos; el resto de zonas usa
-# BANKFULL_DEPTH_M global (1.0 m).
-# Valores preliminares de ingeniería a partir de secciones típicas del río
-# (validables con limnómetros ANA / perfiles INRENA): ríos de régimen
-# pluvio-fluvial con crecidas estivales; el Majes-Camaná arrastra carga de
-# fondo gruesa (cauce amplio y pedregoso), mientras Ocoña y Quilca tienen
-# secciones más estrechas de valle interandino.
+# principal del distrito de La Yarada-Los Palos (provincia de Tacna). Se usa
+# cuando la zona de análisis corresponde a uno de estos cauces; el resto de
+# zonas usa BANKFULL_DEPTH_M global (1.0 m).
+# Valor preliminar de ingeniería: el Caplina es un río costero esporádico
+# (seco la mayor parte del año, cauce encajonado/diqueado) cuya crecida
+# excepcional (FEN) desborda hacia la pampa de La Yarada; su bankfull es
+# menor que el de los ríos andinos. Validable con limnómetros ANA.
 BANKFULL_BY_RIVER_M: dict[str, float] = {
-    "camana": 2.4,   # río Camaná / Majes en el valle bajo
-    "ocoña": 1.6,    # río Ocoña (sector Anchalo: desborde recurrente 02/2025)
-    "quilca": 1.5,   # río Quilca en su desembocadura
+    "caplina": 1.2,  # río Caplina: curso inferior y paleovalle de La Yarada
 }
 
 
@@ -203,22 +200,15 @@ def bankfull_for_zone(zone_id: str | None, aoi_name: str | None = None) -> float
     """Devuelve el bankfull (m) aplicable a una zona del registro.
 
     Reglas:
-      * El prefijo del id (``camana-camana`` → ``camana``) o el nombre de la
-        zona (busca el río en el nombre) determinan el río principal.
+      * El prefijo del id (``tacna-yarada`` → ``tacna``) o el nombre de la
+        zona (busca el cauce en el nombre) determinan el cauce principal.
       * Si no hay coincidencia, aplica el bankfull global (BANKFULL_DEPTH_M).
     """
     key = (zone_id or "").strip().lower()
     name = (aoi_name or "").lower()
-    # Distritos de Camaná mapean al sistema fluvial correspondiente
-    # (el orden importa: los más específicos van primero).
-    if key.startswith("camana-valcarcel"):
-        return BANKFULL_BY_RIVER_M["ocoña"]   # Urasqui está en el valle del Ocoña
-    if key.startswith("camana-ocona"):
-        return BANKFULL_BY_RIVER_M["ocoña"]
-    if key.startswith("camana-quilca"):
-        return BANKFULL_BY_RIVER_M["quilca"]
-    if key.startswith("camana-"):
-        return BANKFULL_BY_RIVER_M["camana"]  # valle Majes-Camaná
+    # Zonas del registro (tacna-*): drenan al sistema del río Caplina.
+    if key.startswith("tacna-"):
+        return BANKFULL_BY_RIVER_M["caplina"]
     for river, depth in BANKFULL_BY_RIVER_M.items():
         if key == river or key.startswith(river + "-") or river in name:
             return depth

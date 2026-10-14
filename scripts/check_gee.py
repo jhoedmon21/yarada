@@ -4,9 +4,9 @@ check_gee.py — Verificación de un comando de la ingesta real de Sentinel-1.
 Uso (tras registrar el proyecto en https://code.earthengine.google.com/register):
 
     cd hidroalert
-    .venv/Scripts/python.exe scripts/check_gee.py          # Distrito de Camaná (Arequipa)
-    .venv/Scripts/python.exe scripts/check_gee.py --zone camana-ocona
-    .venv/Scripts/python.exe scripts/check_gee.py --bbox -72.85,-16.72,-72.60,-16.55
+    .venv/Scripts/python.exe scripts/check_gee.py          # Distrito de La Yarada-Los Palos (Tacna)
+    .venv/Scripts/python.exe scripts/check_gee.py --zone tacna-yarada
+    .venv/Scripts/python.exe scripts/check_gee.py --bbox -70.5853,-18.3501,-70.3161,-18.0776
 
 Pasos que ejecuta:
     1. Inicializa Earth Engine con HIDROALERT_GEE_PROJECT_ID.
@@ -35,12 +35,12 @@ def main() -> int:
     ap.add_argument(
         "--zone",
         default=None,
-        help="Id de zona del registro (ej. camana-ocona, camana-quilca)",
+        help="Id de zona del registro (ej. tacna-yarada, tacna-los-palos)",
     )
     ap.add_argument(
         "--bbox",
         default=None,
-        help="min_lon,min_lat,max_lon,max_lat (por defecto: Dto. de Camaná, Arequipa)",
+        help="min_lon,min_lat,max_lon,max_lat (por defecto: Dto. de La Yarada-Los Palos, Tacna)",
     )
     ap.add_argument("--days", type=int, default=12, help="ventana de búsqueda en días")
     args = ap.parse_args()

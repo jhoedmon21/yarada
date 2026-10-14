@@ -21,7 +21,7 @@ hidroalert/
 ├── models.py                 # Dataclasses del dominio (Snapshot, Simulation, Impacto)
 ├── data_ingest/              # MÓDULO 1 — Ingesta satelital
 │   ├── gee_client.py         #   Autenticación Earth Engine (cuenta de servicio / user)
-│   ├── aoi.py                #   Área de interés + registro de zonas: 8 distritos de Camaná (Arequipa)
+│   ├── aoi.py                #   Área de interés + registro de zonas: distrito de La Yarada-Los Palos (Tacna)
 │   ├── sar_flood.py          #   Sentinel-1 GRD: Otsu + máscara HAND → agua observada
 │   ├── buildings_roads.py    #   MS Buildings Perú (+ respaldo Google Open Buildings)
 │   ├── precipitation.py      #   Lluvia observada IMERG (NASA GPM, base de WN3)
@@ -85,9 +85,9 @@ o cuenta de servicio: guarda el JSON y apunta `HIDROALERT_GEE_SERVICE_ACCOUNT_JS
 Con la API corriendo (paso 4), abra **http://localhost:8000/mando3d** —
 CesiumJS puro en el navegador, sin Streamlit:
 
-* **Zona de vigilancia**: selector con los 8 distritos de Camaná; la cámara
-  vuela al valle y el bankfull se recalibra por río (Camaná 2.4 m · Ocoña
-  1.6 m · Quilca 1.5 m).
+* **Zona de vigilancia**: selector con el distrito de La Yarada-Los Palos
+  (Tacna) y sus subsectores; la cámara vuela a la pampa costera y el
+  bankfull se recalibra por cauce (Caplina 1.2 m).
 * **Escenario**: presets *Lluvia Ligera · Moderada · FEN* + sliders finos
   (lluvia 0–200 mm/h, caudal +0–300 %).
 * **💧 Escorrentía sobre terreno**: toggle que activa la concentración de

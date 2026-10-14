@@ -288,10 +288,10 @@ def health() -> dict:
 @app.get("/zones", tags=["sistema"])
 def zones() -> dict:
     """
-    CatÃ¡logo de zonas de anÃ¡lisis: los 8 distritos de la provincia de
-    CamanÃ¡ (Arequipa), mÃ¡s coordenadas personalizadas vÃ­a bbox. Para ambas UIs.
+    Catálogo de zonas de análisis: distrito de La Yarada-Los Palos (Tacna)
+    y sus subsectores, más coordenadas personalizadas vía bbox. Para ambas UIs.
     """
-    return {"zones": list_zones(), "default": "camana-camana"}
+    return {"zones": list_zones(), "default": "tacna-yarada-los-palos"}
 
 
 @app.get("/scenarios", tags=["simulaciÃ³n"])

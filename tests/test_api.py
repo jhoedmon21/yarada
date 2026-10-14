@@ -28,14 +28,14 @@ def test_scenarios():
 
 
 def test_zones():
-    """Catálogo de zonas: exclusivamente los 8 distritos de Camaná (Arequipa)."""
+    """Catálogo de zonas: distrito de La Yarada-Los Palos (Tacna) + subsectores."""
     resp = client.get("/zones")
     assert resp.status_code == 200
     data = resp.json()
-    assert data["default"] == "camana-camana"
-    assert data["zones"][0]["id"] == "camana-camana"
-    assert len(data["zones"]) == 8
-    assert all(z["id"].startswith("camana-") for z in data["zones"])
+    assert data["default"] == "tacna-yarada-los-palos"
+    assert data["zones"][0]["id"] == "tacna-yarada-los-palos"
+    assert len(data["zones"]) == 4
+    assert all(z["id"].startswith("tacna-") for z in data["zones"])
 
 
 def test_simulate_demo():

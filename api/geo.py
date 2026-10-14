@@ -117,7 +117,7 @@ def get_snapshot(zone_or_bbox: str | None) -> tuple[AreaSnapshot, bool]:
     """
     key = (zone_or_bbox or "").strip()
     if not key:
-        key = "camana-camana"  # zona por defecto: Dto. de Camaná (Arequipa)
+        key = "tacna-yarada-los-palos"  # zona por defecto: Dto. La Yarada-Los Palos (Tacna)
     if key in _SNAP_CACHE:
         return _SNAP_CACHE[key], _SNAP_CACHE[key].aoi_name.startswith("Valle Demo")
 
@@ -156,7 +156,8 @@ def _make_elevation_lookup(
 
     Usa la matriz DEM del snapshot (MERIT `elv`); si no hay (demo) devuelve 0.
     Es CRÍTICA para Cesium: las entidades deben apoyarse sobre el terreno
-    real (Camaná: 0–3 000 m snm), no sobre el elipsoide, o quedarían enterradas.
+    real (La Yarada-Los Palos: 0–200 m snm), no sobre el elipsoide, o
+    quedarían enterradas.
     """
     if dem is None or dem.size == 0:
         return lambda lon, lat: 0.0
@@ -931,7 +932,7 @@ def simulate_geo(
             cuando la capa "Radar SAR" está activada.
     """
     snapshot, demo = get_snapshot(zone_or_bbox)
-    # Bankfull calibrado por río (Camaná 2.4 / Ocoña 1.6 / Quilca 1.5 m)
+    # Bankfull calibrado por río (Caplina 1.2 m)
     bankfull = bankfull_for_zone(zone_or_bbox, snapshot.aoi_name)
     result = simulate_flood(
         snapshot,
@@ -944,7 +945,7 @@ def simulate_geo(
 
     bbox = result.bbox
     # Elevación DEM real por celda: SIN esto las entidades 3D de Cesium
-    # quedarían enterradas bajo el terreno (Camaná: 0–3 000 m snm).
+    # quedarían enterradas bajo el terreno (La Yarada-Los Palos: 0–200 m snm).
     base_h = _make_elevation_lookup(snapshot.dem, bbox)
     roads_gj, roads_blocked, roads_total = _roads_geojson(snapshot, result, bbox)
     drainage_gj = _drainage_geojson(snapshot, bbox, base_h=base_h)
